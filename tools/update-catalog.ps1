@@ -21,6 +21,25 @@ $ytdlp     = Join-Path $bin 'yt-dlp.exe'
 $tmp       = Join-Path $env:TEMP ('fox-update-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force $tmp, $bin | Out-Null
 
+function Save-Thumb([string]$src, [string]$dest) {
+  # downloads the image and saves a 480px-wide JPEG copy
+  Add-Type -AssemblyName System.Drawing
+  $raw = Join-Path $tmp 'thumb.bin'
+  curl.exe -sL -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' -o $raw $src
+  if ($LASTEXITCODE -ne 0 -or -not (Test-Path $raw)) { throw 'download failed' }
+  $img = [System.Drawing.Image]::FromFile($raw)
+  try {
+    $w = [Math]::Min(480, $img.Width); $h = [int]([Math]::Round($img.Height * $w / $img.Width))
+    $bmp = New-Object System.Drawing.Bitmap $w, $h
+    $g = [System.Drawing.Graphics]::FromImage($bmp)
+    $g.InterpolationMode = 'HighQualityBicubic'; $g.DrawImage($img, 0, 0, $w, $h); $g.Dispose()
+    $enc = [System.Drawing.Imaging.ImageCodecInfo]::GetImageEncoders() | Where-Object { $_.MimeType -eq 'image/jpeg' }
+    $ps = New-Object System.Drawing.Imaging.EncoderParameters 1
+    $ps.Param[0] = New-Object System.Drawing.Imaging.EncoderParameter ([System.Drawing.Imaging.Encoder]::Quality), ([long]82)
+    $bmp.Save($dest, $enc, $ps); $bmp.Dispose()
+  } finally { $img.Dispose(); Remove-Item $raw -Force -ErrorAction SilentlyContinue }
+}
+
 function Say([string]$msg, [string]$color = 'Gray') { Write-Host $msg -ForegroundColor $color }
 
 try {
@@ -52,7 +71,7 @@ try {
 
   # ---------- 3. Patreon ----------
   Say 'Reading Patreon posts...'
-  $url = "https://www.patreon.com/api/posts?filter[campaign_id]=$campaign&filter[contains_exclusive_posts]=true&filter[is_draft]=false&fields[post]=title,published_at,url,post_type&sort=-published_at&json-api-version=1.0&page[count]=100"
+  $url = "https://www.patreon.com/api/posts?filter[campaign_id]=$campaign&filter[contains_exclusive_posts]=true&filter[is_draft]=false&fields[post]=title,published_at,url,post_type,current_user_can_view,image&sort=-published_at&json-api-version=1.0&page[count]=100"
   $pat = @(); $page = 0; $pf = Join-Path $tmp 'pat.json'
   while ($url -and $page -lt 50) {
     $page++
@@ -60,7 +79,7 @@ try {
     $o = Get-Content $pf -Raw -Encoding utf8 | ConvertFrom-Json
     foreach ($p in $o.data) {
       if ($p.attributes.post_type -eq 'text_only') { continue }   # notes / welcome posts, not reactions
-      $pat += [pscustomobject]@{ date = ([string]$p.attributes.published_at).Substring(0, 10); title = ([string]$p.attributes.title).Trim(); url = $p.attributes.url }
+      $pat += [pscustomobject]@{ date = ([string]$p.attributes.published_at).Substring(0, 10); title = ([string]$p.attributes.title).Trim(); url = $p.attributes.url; id = [string]$p.id; free = [bool]$p.attributes.current_user_can_view; img = [string]$p.attributes.image.large_url }
     }
     $url = $o.links.next
   }
@@ -114,6 +133,21 @@ try {
   }
 
   if ($DryRun) { Say ''; Say 'Dry run: nothing was saved.' Cyan; return }
+
+  # ---------- 5a. thumbnails of FREE Patreon posts (Patreon image links expire, so keep a copy) ----------
+  $thumbDir = Join-Path $root 'assets\thumbs'
+  New-Item -ItemType Directory -Force $thumbDir | Out-Null
+  $freeIds = @()
+  foreach ($p in ($pat | Where-Object { $_.free -and $_.img })) {
+    $freeIds += $p.id
+    $dest = Join-Path $thumbDir ("patreon-" + $p.id + ".jpg")
+    if (Test-Path $dest) { continue }
+    try { Save-Thumb $p.img $dest; Say "  new thumbnail: $($p.title)" Green }
+    catch { Say "  could not save thumbnail for: $($p.title) ($($_.Exception.Message))" Yellow }
+  }
+  foreach ($t in (Get-ChildItem $thumbDir -Filter 'patreon-*.jpg')) {
+    if ($freeIds -notcontains ($t.BaseName -replace '^patreon-', '')) { Remove-Item $t.FullName -Force; Say "  removed thumbnail (post is no longer free): $($t.Name)" Yellow }
+  }
 
   # ---------- 5. save ----------
   if ($new.Count) {

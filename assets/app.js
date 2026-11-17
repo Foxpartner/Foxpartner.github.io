@@ -83,6 +83,7 @@
       url: x.u,
       original: x.o || '',
       ytId: yt ? yt[1] : null,
+      img: x.i || '',
       hay: norm([x.a, x.g, x.f, x.r, x.o, x.t, x.p].join(' | ')),
     };
   });
@@ -156,8 +157,9 @@
     const rot = ((r() - 0.5) * 3.2).toFixed(2);
     const tape = ((r() - 0.5) * 10).toFixed(1);
     const isYT = d.platform === 'YouTube';
-    const thumb = isYT && d.ytId
-      ? `<div class="thumb"><img loading="lazy" decoding="async" src="https://i.ytimg.com/vi/${d.ytId}/mqdefault.jpg" alt="" onerror="this.remove()"></div>`
+    const src = isYT && d.ytId ? `https://i.ytimg.com/vi/${d.ytId}/mqdefault.jpg` : d.img;
+    const thumb = src
+      ? `<div class="thumb"><img loading="lazy" decoding="async" src="${esc(src)}" alt="" onerror="this.remove()"></div>`
       : `<div class="thumb pt"><span class="stamp">Patreon<small>members only</small></span></div>`;
     const sub = d.artist !== d.group ? `<small>${esc(d.group)}</small>` : '';
     return `<article class="clip" style="--rot:${rot}deg;--tape:${tape}deg">
@@ -169,7 +171,7 @@
           ${d.feats.length ? `<p class="feat">with ${d.feats.map(esc).join(' &amp; ')}</p>` : ''}
           <p class="what">${esc(d.what)}</p>
           <div class="meta">
-            <span class="plat ${isYT ? 'yt' : 'pt'}">${isYT ? '▶ YouTube' : '★ Patreon'}</span>
+            <span class="plat ${isYT ? 'yt' : 'pt'}">${isYT ? '▶ YouTube' : (d.img ? '★ Patreon · free' : '★ Patreon')}</span>
             <time datetime="${esc(d.date)}"${isYT ? ' title="approximate date"' : ''}>${fmtDate(d.date, !isYT)}</time>
           </div>
         </div>

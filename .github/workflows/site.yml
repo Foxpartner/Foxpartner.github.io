@@ -29,10 +29,10 @@ jobs:
       - name: Save changes
         shell: bash
         run: |
-          if [ -n "$(git status --porcelain catalogo.csv data/catalog.js)" ]; then
+          if [ -n "$(git status --porcelain catalogo.csv data/catalog.js assets/thumbs)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add catalogo.csv data/catalog.js
+            git add catalogo.csv data/catalog.js assets/thumbs
             git commit -m "Daily catalog update"
             git push
           else

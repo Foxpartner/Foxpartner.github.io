@@ -284,7 +284,7 @@ a { color: inherit; }
   clip-path: var(--torn-a);
 }
 .section-title.dark span { background: var(--ink); color: var(--paper); }
-.section-sub { margin: 14px 0 28px; font-family: var(--f-type); color: var(--paper-2); font-size: 17px; }
+.archive .section-title { margin-bottom: 30px; }
 
 /* ===== ARCHIVE ===== */
 .archive { padding: 80px 0 90px; background: var(--ink); position: relative; }
