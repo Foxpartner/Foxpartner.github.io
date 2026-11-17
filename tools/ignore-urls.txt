@@ -1,0 +1,2 @@
+# URLs that should NEVER be added to the catalog (one per line).
+# If you delete a row from catalogo.csv and don't want it back, paste its url here.

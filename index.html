@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Foxpartner · Reaction Archive</title>
+  <meta name="description" content="Every reaction Foxpartner has recorded, searchable, with links to YouTube and Patreon. Send your recommendations!">
+  <meta property="og:title" content="Foxpartner · Reaction Archive">
+  <meta property="og:description" content="Search every reaction and send your recommendations.">
+  <meta property="og:image" content="assets/channel-art.png">
+  <meta name="theme-color" content="#EA4F7F">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23EA4F7F'/%3E%3Crect x='10' y='12' width='30' height='38' fill='%23ECE6DA' transform='rotate(-6 25 31)'/%3E%3Ctext x='14' y='46' font-family='Arial Black,Arial' font-weight='900' font-size='38' fill='%23171513'%3EF%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Permanent+Marker&family=Space+Grotesk:wght@400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <a class="skip" href="#archive">Skip to the archive</a>
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="deco" aria-hidden="true">
+      <div class="blk b1"></div>
+      <div class="blk b2"></div>
+      <div class="blk b3"></div>
+      <div class="blk b4"></div>
+      <div class="blk b5"></div>
+      <div class="halftone"></div>
+      <div class="strip s1"></div>
+      <div class="strip s2"></div>
+      <div class="stripes"></div>
+      <div class="news"><span class="news-head">LATE NIGHT EDITION</span><span class="news-lines"></span></div>
+      <div class="burst"></div>
+      <div class="rec-sticker"><span>● REC</span></div>
+      <div class="ink-strip"></div>
+      <div class="dots-patch"></div>
+      <div class="paper-scrap"></div>
+      <svg class="xmarks" viewBox="0 0 120 60"><path d="M8 10 L40 46 M40 12 L10 48 M70 8 L104 40 M100 6 L74 44"/></svg>
+      <svg class="zigzag" viewBox="0 0 220 60"><path d="M6 40 L30 12 L52 44 L76 14 L98 46 L122 16 L144 44 L168 12 L190 42 L214 18"/></svg>
+      <svg class="spiral" viewBox="0 0 200 200"><defs><filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="6"/></filter></defs><path id="spiral-path" filter="url(#rough)"/></svg>
+    </div>
+
+    <nav class="topnav" aria-label="Channels">
+      <a href="#" data-link="youtube" target="_blank" rel="noopener">YouTube ↗</a>
+      <a href="#" data-link="patreon" target="_blank" rel="noopener">Patreon ↗</a>
+    </nav>
+
+    <div class="hero-inner">
+      <p class="kicker">The reaction archive</p>
+      <div class="logo-wrap">
+        <span class="tape t1" aria-hidden="true"></span>
+        <span class="tape t2" aria-hidden="true"></span>
+        <h1 class="logo" aria-label="Foxpartner">
+          <span class="line"><span class="chip">F</span>ox</span>
+          <span class="line"><span class="chip chip-p">p</span>artner</span>
+        </h1>
+      </div>
+      <div class="cta">
+        <a class="btn btn-ink" href="#archive">Search the archive ↓</a>
+        <a class="btn btn-paper" href="#recommend">Recommend a reaction</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ ARCHIVE ============ -->
+  <main id="archive" class="archive">
+    <div class="wrap">
+      <h2 class="section-title"><span>The archive</span></h2>
+      <p class="section-sub">Search by artist, song, album… Then pick where to watch.</p>
+
+      <div class="controls">
+        <label class="search">
+          <span class="visually-hidden">Search reactions</span>
+          <input id="q" type="search" placeholder="Search: ATEEZ, The Warning, BTS, Stray Kids…" autocomplete="off">
+        </label>
+
+        <div class="chips" role="group" aria-label="Platform">
+          <button type="button" class="chip-btn" data-platform="all" aria-pressed="true">All</button>
+          <button type="button" class="chip-btn" data-platform="YouTube" aria-pressed="false">▶ YouTube</button>
+          <button type="button" class="chip-btn" data-platform="Patreon" aria-pressed="false">★ Patreon</button>
+        </div>
+
+        <div class="selects">
+          <label><span>Artist</span><select id="f-group"></select></label>
+          <label><span>Sort</span>
+            <select id="f-sort">
+              <option value="new">Newest first</option>
+              <option value="old">Oldest first</option>
+              <option value="az">Artist A–Z</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <p class="count" id="count" aria-live="polite"></p>
+
+      <div class="grid" id="grid"></div>
+
+      <div class="empty" id="empty" hidden>
+        <p class="empty-big">Nothing here… <em>yet.</em></p>
+        <p>I haven't reacted to that. Want me to?</p>
+        <a class="btn btn-pink" href="#recommend" id="empty-recommend">Recommend it →</a>
+      </div>
+
+      <div class="more-wrap">
+        <button type="button" class="btn btn-paper" id="more" hidden>Load more</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ RECOMMEND ============ -->
+  <section id="recommend" class="recommend">
+    <div class="deco" aria-hidden="true">
+      <div class="blk r1"></div>
+      <div class="blk r2"></div>
+      <div class="halftone h2"></div>
+    </div>
+    <div class="wrap">
+      <h2 class="section-title dark"><span>Send a recommendation</span></h2>
+
+      <div class="rec-grid">
+        <div class="clipping checker">
+          <p class="step">Step 1</p>
+          <h3>Did I already react to it?</h3>
+          <p>Type an artist, song or album and check before sending.</p>
+          <input id="check" type="search" placeholder="e.g. Sleep Token, BAND-MAID, XG…" autocomplete="off" aria-label="Check if a reaction already exists">
+          <div id="check-results" class="check-results" aria-live="polite"></div>
+        </div>
+
+        <div class="clipping form-box">
+          <p class="step">Step 2</p>
+          <h3>Tell me what to react to</h3>
+          <form id="rec-form" class="rec-form" novalidate>
+            <label class="field">
+              <span>What should I react to? <em>*</em></span>
+              <input name="what" type="text" required maxlength="300" placeholder="Artist + song, album or video" autocomplete="off">
+            </label>
+            <div id="dup-warning" class="dup-warning" hidden></div>
+            <label class="field">
+              <span>Link <small>(optional)</small></span>
+              <input name="link" type="url" maxlength="500" placeholder="https://youtube.com/…" autocomplete="off">
+            </label>
+            <button type="submit" class="btn btn-ink" id="rec-submit">Send recommendation →</button>
+            <p id="rec-status" class="rec-status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p class="foot-logo">Foxpartner</p>
+      <p>
+        <a href="#" data-link="youtube" target="_blank" rel="noopener">YouTube</a> ·
+        <a href="#" data-link="patreon" target="_blank" rel="noopener">Patreon</a>
+      </p>
+      <p class="foot-note">stay safe, stay positive!</p>
+    </div>
+  </footer>
+
+  <script src="data/catalog.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
