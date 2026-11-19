@@ -333,7 +333,7 @@
     try {
       await fetch(`https://docs.google.com/forms/d/e/${encodeURIComponent(ff.id)}/formResponse`, { method: 'POST', mode: 'no-cors', body });
       fbForm.reset(); fbHint();
-      fbSetStatus('<b>Thank you!</b> Got your message. 🦊', 'ok');
+      fbSetStatus('<b>Thank you!</b>', 'ok');
     } catch (e) {
       fbSetStatus('Something went wrong. Check your connection and try again.', 'err');
     } finally {
