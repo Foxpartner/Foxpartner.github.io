@@ -53,8 +53,15 @@ try {
   # ---------- 1. yt-dlp (download / self-update) ----------
   if (-not (Test-Path $ytdlp)) {
     Say 'Downloading yt-dlp...'
-    curl.exe -sL -o $ytdlp 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe'
+    $rel = 'https://github.com/yt-dlp/yt-dlp/releases/latest/download'
+    curl.exe -sL -o $ytdlp "$rel/yt-dlp.exe"
     if ($LASTEXITCODE -ne 0) { throw 'Could not download yt-dlp.' }
+    # security: only run it if its SHA-256 matches the official checksum list of the same release
+    $sums = curl.exe -sL "$rel/SHA2-256SUMS"
+    $expected = (@($sums) | Where-Object { $_ -match '\s\*?yt-dlp\.exe$' } | Select-Object -First 1) -replace '\s.*$', ''
+    $actual = (Get-FileHash $ytdlp -Algorithm SHA256).Hash
+    if (-not $expected -or $actual -ne $expected.ToUpper()) { Remove-Item $ytdlp -Force; throw 'yt-dlp download did not match the official checksum - not running it.' }
+    Say '  yt-dlp checksum OK'
   } else {
     & $ytdlp -U --quiet 2>$null | Out-Null
   }

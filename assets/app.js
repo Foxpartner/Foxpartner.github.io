@@ -164,7 +164,7 @@
     const isYT = d.platform === 'YouTube';
     const src = isYT && d.ytId ? `https://i.ytimg.com/vi/${d.ytId}/mqdefault.jpg` : d.img;
     const thumb = src
-      ? `<div class="thumb"><img loading="lazy" decoding="async" src="${esc(src)}" alt="" onerror="this.remove()"></div>`
+      ? `<div class="thumb"><img loading="lazy" decoding="async" src="${esc(src)}" alt=""></div>`
       : `<div class="thumb pt"><span class="stamp">Patreon<small>members only</small></span></div>`;
     const sub = d.artist !== d.group ? `<small>${esc(d.group)}</small>` : '';
     return `<article class="clip" style="--rot:${rot}deg;--tape:${tape}deg">
@@ -185,6 +185,8 @@
   }
 
   const grid = $('#grid'), count = $('#count'), more = $('#more'), empty = $('#empty');
+  // hide thumbnails that fail to load (no inline onerror: blocked by the Content-Security-Policy)
+  grid.addEventListener('error', (ev) => { if (ev.target.tagName === 'IMG') ev.target.remove(); }, true);
 
   function render() {
     const list = filtered();
