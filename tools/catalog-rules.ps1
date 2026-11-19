@@ -45,10 +45,27 @@ $artists = @(
   @('AZ Chike', 'AZ Chike', ''), @('Ice Nine Kills', 'Ice Nine Kills', ''), @('Against The Current', 'Against The Current', ''),
   @('Spiritbox', 'Spiritbox', ''), @('Halsey', 'Halsey', ''), @('Twenty One Pilots', 'Twenty One Pilots', ''),
   @('Aerosmith', 'Aerosmith', ''), @('Pabllo Vittar', 'Pabllo Vittar', ''), @('Maggie Lindemann', 'Maggie Lindemann', ''),
-  @('Dead Poet Society', 'Dead Poet Society', '')
+  @('Dead Poet Society', 'Dead Poet Society', ''), @('P1Harmony', 'P1Harmony', '')
 )
 
+function Get-GuessedArtist([string]$t) {
+  $q = [string][char]0x201C + [char]0x201D + [char]0x2018 + [char]0x2019 + [char]0x300C + [char]0x3010
+  $dash = [string][char]0x2013 + [char]0x2014
+  $h = $t -replace '^\s*(Who is|Meet)\s+', ''
+  # cut at the first separator: " - ", " / ", " | ", "(", "[", quotes, ":" or " ~ "
+  $h = [regex]::Split($h, '\s[-' + $dash + '/|~]\s|\s?[(\[":' + $q + ']|\s''')[0]
+  # drop Korean / Japanese / Chinese text, then keep only the first of several artists
+  $h = $h -replace ('[' + [char]0x1100 + '-' + [char]0x11FF + [char]0x3040 + '-' + [char]0x30FF + [char]0x3400 + '-' + [char]0x9FFF + [char]0xAC00 + '-' + [char]0xD7A3 + ']'), ''
+  $h = [regex]::Split($h, ',\s|\s(x|X|and|&|feat\.?|ft\.?|with)\s')[0]
+  $h = $h.Trim(" '.?!-")
+  $words = @($h -split '\s+').Count
+  if ($h.Length -lt 2 -or $h.Length -gt 40 -or $words -gt 5) { return '' }
+  if ($h -match '(?i)reaction|react|first time|official|episode|\bfull\b|\blive\b|cover|dancer|tier list|\brank\b|inside the studio|tourists|performance|audition') { return '' }
+  return $h
+}
+
 function Get-Artist([string]$t) {
+  $script:artistGuessed = $false
   foreach ($a in $special) { if ($t -match $a[0]) { return @($a[1], $a[2]) } }
   $best = $null; $bestIdx = [int]::MaxValue
   foreach ($a in $artists) {
@@ -56,6 +73,10 @@ function Get-Artist([string]$t) {
     if ($m.Success -and $m.Index -lt $bestIdx) { $bestIdx = $m.Index; $best = $a }
   }
   if ($best) { $g = $best[2]; if (-not $g) { $g = $best[1] }; return @($best[1], $g) }
+  # new artist not in the list yet: use the start of the title, e.g. "P1Harmony (...) - 'BLOW UP' MV" -> P1Harmony
+  $script:artistGuessed = $true
+  $name = Get-GuessedArtist $t
+  if ($name) { return @($name, $name) }
   return @('', '')
 }
 

@@ -88,13 +88,14 @@ try {
 
   # ---------- 4. new items ----------
   $new = New-Object System.Collections.Generic.List[object]
+  $guessed = New-Object System.Collections.Generic.List[string]
   foreach ($line in $ytLines) {
     $f = $line -split "`t", 4
     $u = "https://www.youtube.com/watch?v=$($f[0])"
     if ($known.Contains($u)) { continue }
     $title = ([string]$f[3]).Trim()
     if ($title -match 'PATREON ANNOUNCEMENT') { continue }
-    $a = Get-Artist $title
+    $a = Get-Artist $title; if ($script:artistGuessed -and $a[0]) { $guessed.Add($u) }
     $date = ''; if ($f[1] -match '^\d{8}$') { $date = $f[1].Substring(0,4) + '-' + $f[1].Substring(4,2) + '-' + $f[1].Substring(6,2) }
     if (-not $date) { $date = (Get-Date).ToString('yyyy-MM-dd') }
     $new.Add([pscustomobject]@{ artist = $a[0]; group = $a[1]; featuring = (Get-Feat $title $a[1]); reacted = (Get-Clean $title); type = (Get-Type $title); platform = 'YouTube'; date = $date; url = $u; original_title = $title })
@@ -102,7 +103,7 @@ try {
   }
   foreach ($p in $pat) {
     if ($known.Contains($p.url)) { continue }
-    $title = $p.title; $a = Get-Artist $title
+    $title = $p.title; $a = Get-Artist $title; if ($script:artistGuessed -and $a[0]) { $guessed.Add($p.url) }
     $new.Add([pscustomobject]@{ artist = $a[0]; group = $a[1]; featuring = (Get-Feat $title $a[1]); reacted = (Get-Clean $title); type = (Get-Type $title); platform = 'Patreon'; date = $p.date; url = $p.url; original_title = $title })
     [void]$known.Add($p.url)
   }
@@ -119,7 +120,7 @@ try {
   } else {
     Say "NEW reactions found: $($new.Count)" Green
     foreach ($n in ($new | Sort-Object date -Descending)) {
-      $who = $n.artist; if (-not $who) { $who = '(artist not recognized!)' }
+      $who = $n.artist; if (-not $who) { $who = '(artist not recognized!)' } elseif ($guessed.Contains($n.url)) { $who += ' - NEW ARTIST, name guessed from the title, please check' }
       $feat = ''; if ($n.featuring) { $feat = "  [with $($n.featuring)]" }
       Say ("  {0}  {1,-8} [{2}] {3}{4}" -f $n.date, $n.platform, $who, $n.reacted, $feat)
     }
