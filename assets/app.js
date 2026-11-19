@@ -14,8 +14,8 @@
     },
     // Google Form that receives bug reports / suggestions (the "Bug / idea?" button).
     feedbackForm: {
-      id: '',
-      fields: { kind: '', message: '', details: '' }, // e.g. 'entry.123456789'
+      id: '1FAIpQLSdpOBu9LCrl2IHl6DcQLI-cMV9cGPaXUfBmwlNw68ndQTAfog',
+      fields: { kind: 'entry.550363187', message: 'entry.1083056034', details: 'entry.791100623' },
     },
     pageSize: 24,
   };
