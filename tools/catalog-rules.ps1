@@ -51,15 +51,21 @@ $artists = @(
 function Get-GuessedArtist([string]$t) {
   $q = [string][char]0x201C + [char]0x201D + [char]0x2018 + [char]0x2019 + [char]0x300C + [char]0x3010
   $dash = [string][char]0x2013 + [char]0x2014
-  $h = $t -replace '^\s*(Who is|Meet)\s+', ''
+  # remove intros like "Former DANCER reacts to", "Who is", "First time hearing", "Proud Brazilian reacts to"
+  $intro = '(?i)^\s*((former|forner)\s+dancer\s+("?reacts?"?\s*(\([^)]*\))?\s*(to\s+)?|falling in love with\s+)|proud brazilian reacts to\s+|first time (hearing|listening to|watching)\s+|learning about\s+|who is\s+|meet\s+)'
+  $h = $t -replace $intro, ''
+  $hadIntro = ($h -ne $t)
+  $h = $h -replace '(?i)\s+\d\s*in\s*1\b.*$', '' -replace '(?i)\s+for the first time\b.*$', ''
   # cut at the first separator: " - ", " / ", " | ", "(", "[", quotes, ":" or " ~ "
   $h = [regex]::Split($h, '\s[-' + $dash + '/|~]\s|\s?[(\[":' + $q + ']|\s''')[0]
   # drop Korean / Japanese / Chinese text, then keep only the first of several artists
   $h = $h -replace ('[' + [char]0x1100 + '-' + [char]0x11FF + [char]0x3040 + '-' + [char]0x30FF + [char]0x3400 + '-' + [char]0x9FFF + [char]0xAC00 + '-' + [char]0xD7A3 + ']'), ''
   $h = [regex]::Split($h, ',\s|\s(x|X|and|&|feat\.?|ft\.?|with)\s')[0]
+  $h = $h -replace '(?i)\s+(dance practice|choreography|official|m/?v|music video|teaser|visualizer|live)\b.*$', ''
   $h = $h.Trim(" '.?!-")
   $words = @($h -split '\s+').Count
-  if ($h.Length -lt 2 -or $h.Length -gt 40 -or $words -gt 5) { return '' }
+  $min = 2; if ($hadIntro) { $min = 1 }   # "Who is V???" -> V
+  if ($h.Length -lt $min -or $h.Length -gt 40 -or $words -gt 5) { return '' }
   if ($h -match '(?i)reaction|react|first time|official|episode|\bfull\b|\blive\b|cover|dancer|tier list|\brank\b|inside the studio|tourists|performance|audition') { return '' }
   return $h
 }
