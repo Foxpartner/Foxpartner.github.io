@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Permanent+Marker&family=Space+Grotesk:wght@400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=4">
+  <link rel="stylesheet" href="assets/style.css?v=5">
 </head>
 <body>
 
@@ -158,11 +158,33 @@
         <a href="#" data-link="youtube" target="_blank" rel="noopener">YouTube</a> ·
         <a href="#" data-link="patreon" target="_blank" rel="noopener">Patreon</a>
       </p>
+      <p><button type="button" class="foot-fb" data-fb-open>Report a bug or send a suggestion</button></p>
       <p class="foot-note">stay safe, stay positive!</p>
     </div>
   </footer>
 
-  <script src="data/catalog.js?v=4"></script>
-  <script src="assets/app.js?v=4"></script>
+  <!-- ============ FEEDBACK (bug / suggestion) ============ -->
+  <button type="button" class="fb-open" data-fb-open aria-haspopup="dialog">Bug / idea?</button>
+
+  <dialog id="fb" class="fb" aria-labelledby="fb-title">
+    <form id="fb-form" class="rec-form" novalidate>
+      <button type="button" class="fb-x" data-fb-close aria-label="Close">×</button>
+      <p class="step">Feedback</p>
+      <h3 id="fb-title">Found a bug? Got an idea?</h3>
+      <div class="fb-kind" role="radiogroup" aria-label="Type">
+        <label><input type="radio" name="kind" value="Bug" checked><span>Bug</span></label>
+        <label><input type="radio" name="kind" value="Suggestion"><span>Suggestion</span></label>
+      </div>
+      <label class="field">
+        <span>Tell me more <em>*</em></span>
+        <textarea name="message" rows="5" maxlength="1500" required></textarea>
+      </label>
+      <button type="submit" class="btn btn-ink" id="fb-submit">Send →</button>
+      <p id="fb-status" class="rec-status" aria-live="polite"></p>
+    </form>
+  </dialog>
+
+  <script src="data/catalog.js?v=5"></script>
+  <script src="assets/app.js?v=5"></script>
 </body>
 </html>

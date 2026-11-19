@@ -12,6 +12,11 @@
       id: '1FAIpQLSeW-Nruh1vB72G2ZohnrtDhQVp8fBQkdBjwyke7OEYHYIzEag',
       fields: { what: 'entry.832068007', link: 'entry.1800166251' },
     },
+    // Google Form that receives bug reports / suggestions (the "Bug / idea?" button).
+    feedbackForm: {
+      id: '',
+      fields: { kind: '', message: '', details: '' }, // e.g. 'entry.123456789'
+    },
     pageSize: 24,
   };
 
@@ -279,6 +284,60 @@
       setStatus('Something went wrong. Check your connection and try again.', 'err');
     } finally {
       submitBtn.disabled = false;
+    }
+  });
+
+  // ---------- feedback: bug report / suggestion ----------
+  const fb = $('#fb'), fbForm = $('#fb-form'), fbStatus = $('#fb-status'), fbSubmit = $('#fb-submit');
+  const ff = CONFIG.feedbackForm;
+  const fbReady = !!(ff.id && ff.fields.kind && ff.fields.message);
+  const fbHints = {
+    Bug: 'What went wrong? What were you doing when it happened?',
+    Suggestion: 'What would make this site better?',
+  };
+  function fbSetStatus(msg, kind) { fbStatus.className = 'rec-status' + (kind ? ' ' + kind : ''); fbStatus.innerHTML = msg; }
+  function fbKind() { return fbForm.elements.kind.value || 'Bug'; }
+  function fbHint() { fbForm.elements.message.placeholder = fbHints[fbKind()]; }
+  function fbOpen() {
+    fbSetStatus(''); fbHint();
+    if (typeof fb.showModal === 'function') fb.showModal(); else fb.setAttribute('open', '');
+    fbForm.elements.message.focus();
+  }
+  function fbClose() { if (typeof fb.close === 'function') fb.close(); else fb.removeAttribute('open'); }
+
+  document.querySelectorAll('[data-fb-open]').forEach((b) => b.addEventListener('click', fbOpen));
+  fb.querySelector('[data-fb-close]').addEventListener('click', fbClose);
+  fb.addEventListener('click', (ev) => { if (ev.target === fb) fbClose(); }); // click outside the box
+  fbForm.querySelectorAll('input[name="kind"]').forEach((r) => r.addEventListener('change', fbHint));
+  if (location.hash === '#feedback') fbOpen(); // direct link: foxpartner.github.io/#feedback
+
+  fbForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const message = fbForm.elements.message.value.trim();
+    if (message.length < 3) { fbSetStatus('Write a few words first!', 'err'); fbForm.elements.message.focus(); return; }
+    if (!fbReady) { fbSetStatus('This form isn\'t connected yet. Please try again soon!', 'err'); return; }
+
+    // extra info that helps to find bugs (no personal data)
+    const details = [
+      'Page: ' + location.pathname + location.search,
+      'Screen: ' + window.innerWidth + 'x' + window.innerHeight,
+      'Browser: ' + navigator.userAgent,
+    ].join(' | ');
+
+    const body = new FormData();
+    body.append(ff.fields.kind, fbKind());
+    body.append(ff.fields.message, message);
+    if (ff.fields.details) body.append(ff.fields.details, details);
+
+    fbSubmit.disabled = true; fbSetStatus('Sending…');
+    try {
+      await fetch(`https://docs.google.com/forms/d/e/${encodeURIComponent(ff.id)}/formResponse`, { method: 'POST', mode: 'no-cors', body });
+      fbForm.reset(); fbHint();
+      fbSetStatus('<b>Thank you!</b> Got your message. 🦊', 'ok');
+    } catch (e) {
+      fbSetStatus('Something went wrong. Check your connection and try again.', 'err');
+    } finally {
+      fbSubmit.disabled = false;
     }
   });
 

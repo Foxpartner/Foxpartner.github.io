@@ -576,3 +576,64 @@ a { color: inherit; }
   .recommend .section-title { font-size: 7.4vw; text-align: center; }
   .recommend .section-title span { padding: 6px 12px 2px; max-width: 100%; }
 }
+
+/* ===== FEEDBACK (bug / suggestion) ===== */
+.fb-open {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50;
+  font-family: var(--f-display); font-size: 13px; letter-spacing: .02em; text-transform: uppercase;
+  background: var(--pink); color: var(--ink);
+  border: 0; padding: 11px 16px 10px; cursor: pointer;
+  clip-path: var(--torn-b);
+  transform: rotate(-3deg);
+  filter: drop-shadow(3px 4px 0 rgba(0,0,0,.55));
+  transition: transform .15s ease;
+}
+.fb-open:hover, .fb-open:focus-visible { transform: rotate(0deg) scale(1.06); }
+.foot-fb {
+  font: inherit; color: var(--paper); background: none; border: 0; padding: 0;
+  text-decoration: underline; cursor: pointer;
+}
+.foot-fb:hover { color: var(--pink); }
+
+.fb {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  border: 0; padding: 30px 26px 26px;
+  background: var(--paper); color: var(--ink);
+  clip-path: var(--torn-a);
+  overflow: auto;
+}
+.fb::backdrop { background: rgba(23, 21, 19, .78); }
+.fb .step { justify-self: start; margin-right: 48px; }
+.fb h3 { margin: 4px 0 14px; font-family: var(--f-display); font-weight: 400; font-size: 26px; line-height: 1.1; }
+.fb-x {
+  position: absolute; top: 14px; right: 16px;
+  width: 36px; height: 36px; border: 0; cursor: pointer;
+  background: var(--ink); color: var(--paper);
+  font-size: 24px; line-height: 1;
+}
+.fb-x:hover { background: var(--pink-deep); }
+.fb-kind { display: flex; gap: 10px; margin-bottom: 14px; }
+.fb-kind input { position: absolute; opacity: 0; pointer-events: none; }
+.fb-kind span {
+  display: inline-block; cursor: pointer;
+  font-family: var(--f-display); font-size: 14px; text-transform: uppercase;
+  padding: 9px 14px 8px;
+  background: var(--paper-2); color: var(--ink);
+  clip-path: var(--torn-b);
+  transition: transform .15s ease;
+}
+.fb-kind span:hover { transform: rotate(-2deg); }
+.fb-kind input:checked + span { background: var(--ink); color: var(--paper); }
+.fb-kind input:focus-visible + span { outline: 3px solid var(--pink-deep); outline-offset: 2px; }
+.fb textarea {
+  width: 100%; resize: vertical; min-height: 120px;
+  font-family: var(--f-type); font-size: 16px;
+  border: 3px solid var(--ink); background: #fff8ec; color: var(--ink);
+  padding: 10px 13px;
+}
+.fb textarea:focus { outline: none; border-color: var(--pink-deep); }
+@media (max-width: 560px) {
+  .fb-open { right: 12px; bottom: 12px; font-size: 12px; padding: 9px 13px 8px; }
+  .fb { padding: 26px 18px 22px; }
+}
