@@ -121,6 +121,10 @@ function Get-Feat([string]$t, [string]$mainGroup) {
 
 function Get-Type([string]$t) {
   $i = 'IgnoreCase'
+  # look only at the video name, not at the comment that follows it
+  # ("... M/V - Still thinking about the MAMA performance!" is a music video, not a live stage)
+  $t = [regex]::Replace($t, '(\bM/V\b|\bMV\b|Official (Music )?Video|Visualizer|Lyric Video)\s+-\s+.*$', '$1', $i)
+  $t = [regex]::Replace($t, '\s*/\s*(REACTION|REACTON)\b\s*-\s+.*$', '', $i)
   if ($t -match '^@\w+') { return 'Short' }
   if ([regex]::IsMatch($t, 'acapella|medley|Enter Sandman \(evolution|You Oughta Know', $i)) { return 'Cover' }
   if ([regex]::IsMatch($t, '\bMMA 20|BAND Ver|in BUSAN|acoustic|' + [char]0xC778 + [char]0xAE30 + [char]0xAC00 + [char]0xC694, $i) -and -not [regex]::IsMatch($t, 'full (album|ep)', $i)) { return 'Live / Stage' }
