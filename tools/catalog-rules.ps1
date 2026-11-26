@@ -158,6 +158,9 @@ function Get-Clean([string]$t) {
     elseif ($first.Length -ge 4) { $c = $first }
   }
   $c = [regex]::Replace($c, [string][char]0x3010 + 'Official Music Video' + [char]0x3011, ' ')
+  # comments after the video name, e.g. "... M/V - Still thinking about ..." or "... - Music reaction"
+  $c = [regex]::Replace($c, '\s+-\s+[^-]*\breaction\b.*$', '', 'IgnoreCase')
+  $c = [regex]::Replace($c, '(\bM/V\b|\bMV\b|Official (Music )?Video|Visualizer|Lyric Video)\s+-\s+.*$', '$1', 'IgnoreCase')
   $c = [regex]::Replace($c, '\s*[-/]?\s*(REACTION|REACTON|Reaction)\b.*$', '')
   $hangul = '\(\s*[' + [char]0xAC00 + '-' + [char]0xD7A3 + '\s]+\)'
   $c = [regex]::Replace($c, $hangul, '')
